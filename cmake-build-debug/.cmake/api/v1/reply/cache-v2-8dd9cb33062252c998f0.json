@@ -55,7 +55,11 @@
 				}
 			],
 			"type" : "INTERNAL",
+<<<<<<<< HEAD:cmake-build-debug/.cmake/api/v1/reply/cache-v2-8dd9cb33062252c998f0.json
 			"value" : "c:/Users/jct50/CLionProjects/SE-300-Firewall-Project-Fall-2024/cmake-build-debug"
+========
+			"value" : "c:/Users/etdas/CLionProjects/SE-300-Firewall-Project-Fall-2024/cmake-build-debug"
+>>>>>>>> origin/master:cmake-build-debug/.cmake/api/v1/reply/cache-v2-63aa7a5a64f4d31c2e74.json
 		},
 		{
 			"name" : "CMAKE_CACHE_MAJOR_VERSION",
@@ -415,7 +419,11 @@
 				}
 			],
 			"type" : "STATIC",
+<<<<<<<< HEAD:cmake-build-debug/.cmake/api/v1/reply/cache-v2-8dd9cb33062252c998f0.json
 			"value" : "C:/Users/jct50/CLionProjects/SE-300-Firewall-Project-Fall-2024/cmake-build-debug/CMakeFiles/pkgRedirects"
+========
+			"value" : "C:/Users/etdas/CLionProjects/SE-300-Firewall-Project-Fall-2024/cmake-build-debug/CMakeFiles/pkgRedirects"
+>>>>>>>> origin/master:cmake-build-debug/.cmake/api/v1/reply/cache-v2-63aa7a5a64f4d31c2e74.json
 		},
 		{
 			"name" : "CMAKE_GENERATOR",
@@ -487,7 +495,11 @@
 				}
 			],
 			"type" : "INTERNAL",
+<<<<<<<< HEAD:cmake-build-debug/.cmake/api/v1/reply/cache-v2-8dd9cb33062252c998f0.json
 			"value" : "C:/Users/jct50/CLionProjects/SE-300-Firewall-Project-Fall-2024"
+========
+			"value" : "C:/Users/etdas/CLionProjects/SE-300-Firewall-Project-Fall-2024"
+>>>>>>>> origin/master:cmake-build-debug/.cmake/api/v1/reply/cache-v2-63aa7a5a64f4d31c2e74.json
 		},
 		{
 			"name" : "CMAKE_INSTALL_PREFIX",
@@ -1135,7 +1147,11 @@
 				}
 			],
 			"type" : "STATIC",
+<<<<<<<< HEAD:cmake-build-debug/.cmake/api/v1/reply/cache-v2-8dd9cb33062252c998f0.json
 			"value" : "C:/Users/jct50/CLionProjects/SE-300-Firewall-Project-Fall-2024/cmake-build-debug"
+========
+			"value" : "C:/Users/etdas/CLionProjects/SE-300-Firewall-Project-Fall-2024/cmake-build-debug"
+>>>>>>>> origin/master:cmake-build-debug/.cmake/api/v1/reply/cache-v2-63aa7a5a64f4d31c2e74.json
 		},
 		{
 			"name" : "untitled_IS_TOP_LEVEL",
@@ -1159,7 +1175,11 @@
 				}
 			],
 			"type" : "STATIC",
+<<<<<<<< HEAD:cmake-build-debug/.cmake/api/v1/reply/cache-v2-8dd9cb33062252c998f0.json
 			"value" : "C:/Users/jct50/CLionProjects/SE-300-Firewall-Project-Fall-2024"
+========
+			"value" : "C:/Users/etdas/CLionProjects/SE-300-Firewall-Project-Fall-2024"
+>>>>>>>> origin/master:cmake-build-debug/.cmake/api/v1/reply/cache-v2-63aa7a5a64f4d31c2e74.json
 		}
 	],
 	"kind" : "cache",

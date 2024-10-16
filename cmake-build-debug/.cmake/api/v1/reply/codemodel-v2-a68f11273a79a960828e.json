@@ -49,8 +49,13 @@
 	"kind" : "codemodel",
 	"paths" : 
 	{
+<<<<<<<< HEAD:cmake-build-debug/.cmake/api/v1/reply/codemodel-v2-a68f11273a79a960828e.json
 		"build" : "C:/Users/jct50/CLionProjects/SE-300-Firewall-Project-Fall-2024/cmake-build-debug",
 		"source" : "C:/Users/jct50/CLionProjects/SE-300-Firewall-Project-Fall-2024"
+========
+		"build" : "C:/Users/etdas/CLionProjects/SE-300-Firewall-Project-Fall-2024/cmake-build-debug",
+		"source" : "C:/Users/etdas/CLionProjects/SE-300-Firewall-Project-Fall-2024"
+>>>>>>>> origin/master:cmake-build-debug/.cmake/api/v1/reply/codemodel-v2-7c5ad27cd5dd4f155887.json
 	},
 	"version" : 
 	{
