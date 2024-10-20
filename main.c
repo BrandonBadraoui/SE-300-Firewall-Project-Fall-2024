@@ -49,49 +49,66 @@ void IP_to_Domain() {//converts ip address to a domain name
 
 }
 
-int HexToDec(const char *hex) {
-    int decimal = 0;
-    int base = 1; //base 16
+void HexToDec(const char *input) {
+    char hex[20]; // Buffer for each hexadecimal number
+    int decimal;
+    int total = 0; // Variable to accumulate the total decimal value
 
-    //Get the length of the hex string
-    int length = strlen(hex);
+    // Create a mutable copy of the input
+    char inputCopy[100];
+    strcpy(inputCopy, input);
 
-    //loop through each digit in the hex string
-    for (int i = length - 1; i >= 0; i--) {
-        char currChar = hex[i];
+    // Tokenize the input string using space as a delimiter
+    char *token = strtok(inputCopy, " ");
+    while (token != NULL) {
+        decimal = 0; // Reset decimal for each hex number
+        int base = 1; // Base 16
 
+        // Get the length of the hex string
+        int len = strlen(token);
 
-        // Convert character to uppercase to simplify comparison
-        if (currChar >= 'a' && currChar <= 'f') {
-            currChar = toupper(currChar);
+        // Loop through each character in the hex string
+        for (int i = len - 1; i >= 0; i--) {
+            char currentChar = token[i];
+
+            // Convert character to uppercase to simplify comparison
+            if (currentChar >= 'a' && currentChar <= 'f') {
+                currentChar = toupper(currentChar);
+            }
+
+            // Determine the decimal value of the current character
+            int value;
+            if (currentChar >= '0' && currentChar <= '9') {
+                value = currentChar - '0';
+            } else if (currentChar >= 'A' && currentChar <= 'F') {
+                value = currentChar - 'A' + 10;
+            } else {
+                // Invalid hex character
+                fprintf(stderr, "Invalid hexadecimal character: %c\n", token[i]);
+                break; // Skip to the next token
+            }
+
+            // Update decimal value
+            decimal += value * base;
+            base *= 16; // Move to the next power of 16
         }
 
-        //Determine the decimal value of the current character
-        int value;
-        if (currChar >= '0' && currChar <= '9') {
-            value = currChar - '0';
-        } else if (currChar >= 'A' && currChar <= 'F') {
-            value = currChar - 'A' + 10;
-        }else {
-            //invlaid hex digit
-            fprintf(stderr, "Invalid Hexadecimal Character %c\n", hex[i]);
-            return -1;
-        }
-        // Update decimal value
-        decimal += value * base;
-        base *= 16; // Move to the next power of 16
+        // Print the result for the current hex number
+        printf("Hexadecimal: %s Decimal: %d\n", token, decimal);
+
+        // Add to the total
+        total += decimal;
+
+        token = strtok(NULL, " "); // Get the next token
     }
-    return decimal;
+    // Print the total sum of all decimal values
+    printf("Total Decimal Value: %d\n", total);
 }
 
-
 int main(void) {
-    const char *hexNumber = "B00B5"; // Example hex number
-    int decimalValue = HexToDec(hexNumber);
+    const char *input = "B00B5";
 
-    if (decimalValue != -1) {
-        printf("Hexadecimal: %s\nDecimal: %d\n", hexNumber, decimalValue);
-    }
+    HexToDec(input); // Call the function with the hardcoded value
 
     return 0;
 }
