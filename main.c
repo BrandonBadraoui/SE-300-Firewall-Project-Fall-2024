@@ -50,12 +50,12 @@ void IP_to_Domain() {//converts ip address to a domain name
 }
 
 void HexToDec(const char *input) {
-    char hex[20]; // Buffer for each hexadecimal number
+    char hex[100]; // Buffer for each hexadecimal number
     int decimal;
     int total = 0; // Variable to accumulate the total decimal value
 
     // Create a mutable copy of the input
-    char inputCopy[100];
+    char inputCopy[1000];
     strcpy(inputCopy, input);
 
     // Tokenize the input string using space as a delimiter
@@ -106,7 +106,7 @@ void HexToDec(const char *input) {
 }
 
 int main(void) {
-    const char *input = "B00B5";
+    const char *input = "B00B 5000";
 
     HexToDec(input); // Call the function with the hardcoded value
 
