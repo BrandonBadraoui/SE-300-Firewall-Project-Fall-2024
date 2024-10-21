@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
+//#include <pcap.h>
 
 // int train() {
 //     printf("Choo Choo\n\n");
@@ -105,10 +106,22 @@ void HexToDec(const char *input) {
     printf("Total Decimal Value: %d\n", total);
 }
 
-int main(void) {
+// int findDevice() {
+//
+// }
+
+
+int main(int argc, char *argv[]){
+    char *dev = argv[1];
+
+    printf("Device: %s\n\n", dev);
+
+
     const char *input = "B00B 5000";
 
     HexToDec(input); // Call the function with the hardcoded value
+
+
 
     return 0;
 }
