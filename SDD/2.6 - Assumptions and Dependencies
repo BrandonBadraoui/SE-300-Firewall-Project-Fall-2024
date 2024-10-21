@@ -1,0 +1,7 @@
+For this program to work, the user will be assumed to meet some requirements. Due to the nature and scope of our project, there will be a few things that are required from the user, some of which are: 
+The user must have a device (either physical or VM) that is running the Debian Linux OS. 
+The user must be connected to any network for the firewall to filter networks. 
+The user will have to install the firewall onto their system.  
+For the user to set their own ruleset, the user must have a basic understanding of how a firewall works and what it blocks. 
+The user must be able to install a kernel module on their device 
+More to come…. 
