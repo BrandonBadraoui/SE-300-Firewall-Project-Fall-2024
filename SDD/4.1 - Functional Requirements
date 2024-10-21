@@ -1,0 +1,17 @@
+The program will be installed once granted permission by the user. 
+The system will install all the items needed in an easy package for the user. 
+The user must ensure that their system is compatible with the software. 
+The system shall successfully intercept data packets and temporarily hold them. 
+The system shall be able to parse out basic information from intercepted data packets. 
+Parsed data shall be used with the existing threat detection systems listed in UC3-5. 
+All network activity and basic packet information shall be logged for future analysis. 
+Firewall must have URL filtering capabilities with customizable block/allow lists 
+The firewall must be configured to automatically update its database of known malicious sites using real-time threat intelligence feeds from reputable sources 
+Domain Name System (DNS) filtering must be enabled to block requests to domains associated with phishing, malware, or other security threats 
+Deep Packet Inspection (DPI) should be enabled to inspect HTTP, HTTPS, and other protocols to identify potential threats 
+Users should be notified when a domain is blocked, with an explanation and instructions on what to do if they believe the block is in error 
+The Firewall must be able to detect an increase in network traffic and be able to distinguish it from typical user traffic  
+The firewall must be able to apply rate limits to reduce the amount of traffic the network can receive  
+Firewall must be able to filter the users intended traffic from malicious packets so that the users browsing is not interrupted 
+Firewall must log any attempts to access blocked domains and provide real-time alerts for such events  
+The firewall must support custom domain or URL blocking, allowing users to manually add domains to a blacklist 
