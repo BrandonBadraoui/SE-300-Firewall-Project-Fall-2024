@@ -155,21 +155,21 @@ void HexToDec(const char *input) {
     printf("Total Decimal Value: %d\n", total);
 }
 
-int findDevice() {
-    int argc;
-    char **argv;
-    // Name of device
-    char error_buffer[PCAP_ERRBUF_SIZE]; // Size defined in pcap.h
-
-    //Finds a device
-    char *device = pcap_lookupdev(error_buffer);
-    if (device == NULL) {
-        printf("Error finding device: %s\n", error_buffer);
-        return 1;
-    }
-    printf("Network device found: %s\n", device);
-    return 0;
-}
+// int findDevice() {
+//     int argc;
+//     char **argv;
+//     // Name of device
+//     char error_buffer[PCAP_ERRBUF_SIZE]; // Size defined in pcap.h
+//
+//     //Finds a device
+//     char *device = pcap_lookupdev(error_buffer);
+//     if (device == NULL) {
+//         printf("Error finding device: %s\n", error_buffer);
+//         return 1;
+//     }
+//     printf("Network device found: %s\n", device);
+//     return 0;
+// }
 
 int main(int argc, char *argv[]) {
     const char *input = "41 65"; // Example input
