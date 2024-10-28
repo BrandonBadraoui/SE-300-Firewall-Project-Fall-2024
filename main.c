@@ -2,52 +2,36 @@
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
-//#include <pcap.h>
+#include <pcap.h>
 
-// int train() {
-//     printf("Choo Choo\n\n");
-//     return 1;
-// }
-
-// void sussy() {
-//     printf("sussy amogus");
-//     int var1 = train();
-// }
-
-void ReadPacket() { //will need to incorperate Tcdump as Tcpdump provides hexadecimal outputs
-
+void ReadPacket() {
+    //will need to incorperate Tcdump as Tcpdump provides hexadecimal outputs
 }
 
 void DataHandler() {
-
 }
 
 void Firewall() {
-
 }
 
 void Website_Blacklist() {
-
 }
 
 void Hash() {
-
 }
 
-void FreeWillie() { //Will free the register from the packets data after we determine we do not want it
-
+void FreeWillie() {
+    //Will free the register from the packets data after we determine we do not want it
 }
 
 void SendPort() {
-
 }
 
 void ReceivePort() {
-
 }
 
-void IP_to_Domain() {//converts ip address to a domain name
-
+void IP_to_Domain() {
+    //converts ip address to a domain name
 }
 
 void HexToDec(const char *input) {
@@ -106,21 +90,29 @@ void HexToDec(const char *input) {
     printf("Total Decimal Value: %d\n", total);
 }
 
-// int findDevice() {
-//
-// }
+int findDevice() {
+    int argc;
+    char **argv;
+    // Name of device
+    char error_buffer[PCAP_ERRBUF_SIZE]; // Size defined in pcap.h
+
+    //Finds a device
+    char *device = pcap_lookupdev(error_buffer);
+    if (device == NULL) {
+        printf("Error finding device: %s\n", error_buffer);
+        return 1;
+    }
+    printf("Network device found: %s\n", device);
+    return 0;
+}
 
 
-int main(int argc, char *argv[]){
-    char *dev = argv[1];
-
-    printf("Device: %s\n\n", dev);
-
+int main() {
+    findDevice();
 
     const char *input = "B00B 5000";
 
     HexToDec(input); // Call the function with the hardcoded value
-
 
 
     return 0;
