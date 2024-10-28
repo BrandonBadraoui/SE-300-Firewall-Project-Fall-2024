@@ -36,8 +36,8 @@ void Hash() {
 
 }
 
-void FreeWillie() { //Will free the register from the packets data after we determine we do not want it
-
+void FreeWillie() {
+    //Will free the register from the packets data after we determine we do not want it
 }
 
 void SendPort() {
@@ -48,8 +48,8 @@ void ReceivePort() {
 
 }
 
-void IP_to_Domain() {//converts ip address to a domain name
-
+void IP_to_Domain() {
+    //converts ip address to a domain name
 }
 
 
@@ -103,13 +103,18 @@ void HexToASCII(const char *input) {
 }
 
 void HexToDec(const char *input) {
+    char hex[100]; // Buffer for each hexadecimal number
+    int decimal;
+    int total = 0; // Variable to accumulate the total decimal value
+
+    // Create a mutable copy of the input
     char inputCopy[1000];
     strcpy(inputCopy, input);
 
     // Tokenize the input string using space as a delimiter
     char *token = strtok(inputCopy, " ");
     while (token != NULL) {
-        int decimal = 0; // Reset decimal for each hex number
+        decimal = 0; // Reset decimal for each hex number
         int base = 1; // Base 16
 
         // Get the length of the hex string
@@ -146,6 +151,24 @@ void HexToDec(const char *input) {
 
         token = strtok(NULL, " "); // Get the next token
     }
+    // Print the total sum of all decimal values
+    printf("Total Decimal Value: %d\n", total);
+}
+
+int findDevice() {
+    int argc;
+    char **argv;
+    // Name of device
+    char error_buffer[PCAP_ERRBUF_SIZE]; // Size defined in pcap.h
+
+    //Finds a device
+    char *device = pcap_lookupdev(error_buffer);
+    if (device == NULL) {
+        printf("Error finding device: %s\n", error_buffer);
+        return 1;
+    }
+    printf("Network device found: %s\n", device);
+    return 0;
 }
 
 int main(int argc, char *argv[]) {
