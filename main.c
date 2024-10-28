@@ -6,16 +6,6 @@
 
 #define MAX_TOKENS 1000 // Maximum number of hexadecimal inputs
 
-// int train() {
-//     printf("Choo Choo\n\n");
-//     return 1;
-// }
-
-// void sussy() {
-//     printf("sussy amogus");
-//     int var1 = train();
-// }
-
 void ReadPacket() { //will need to incorperate Tcdump as Tcpdump provides hexadecimal outputs
 
 }
@@ -155,23 +145,56 @@ void HexToDec(const char *input) {
     printf("Total Decimal Value: %d\n", total);
 }
 
-// int findDevice() {
-//     int argc;
-//     char **argv;
-//     // Name of device
+// int findDeviceInfo() {
+//     char  ip[13], subnet_mask[14];
+
+//     bpf_u_int32 ip_raw; // IP address as an int
+//     bpf_u_int32 subnet_mask_raw; // Subnet Mask as an int
+
 //     char error_buffer[PCAP_ERRBUF_SIZE]; // Size defined in pcap.h
-//
-//     //Finds a device
-//     char *device = pcap_lookupdev(error_buffer);
+//     struct in_addr address;
+
+//     //Finds a Device
+//     char *device = pcap_lookupdev(error_buffer); // Name of device
 //     if (device == NULL) {
-//         printf("Error finding device: %s\n", error_buffer);
+//         printf(" %s\n", error_buffer);
 //         return 1;
 //     }
-//     printf("Network device found: %s\n", device);
+
+//     /*Get Device Info*/
+//     int lookup_return_code = pcap_lookupnet(device, &ip_raw, &subnet_mask_raw, error_buffer);
+//     if (lookup_return_code == -1) {
+//         printf("%s\n", error_buffer);
+//         return 1;
+//     }
+
+//     // Readable IP
+//     address.s_addr = ip_raw;
+//     strcpy(ip, inet_ntoa(address));
+//     if (inet_ntoa(address) == NULL) {
+//         perror("inet_ntoa"); /* print error */
+//         return 1;
+//     }
+
+//     //Readable subnet mask
+//     address.s_addr = subnet_mask_raw;
+//     snprintf(subnet_mask, sizeof(subnet_mask), inet_ntoa(address));
+//     if (inet_ntoa(address) == NULL) {
+//         perror("inet_ntoa");
+//         return 1;
+//     }
+
+//     printf("Device: %s\n", device);
+//     printf("IP address: %s\n", ip);
+//     printf("Subnet mask: %s\n", subnet_mask);
+
 //     return 0;
 // }
 
+
+
 int main(int argc, char *argv[]) {
+    // FindDeviceInfo();
     const char *input = "41 65"; // Example input
     HexToDec(input); // Call the function to process the input
     HexToASCII(input);
