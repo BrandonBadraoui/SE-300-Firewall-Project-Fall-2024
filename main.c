@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <math.h>
 //#include <pcap.h>
 
 #define MAX_TOKENS 1000 // Maximum number of hexadecimal inputs
@@ -16,6 +17,41 @@ void DataHandler() {
 
 void Firewall() {
 
+}
+
+void LogTraffic(char IPaddress[])
+{
+    //************************************************************************
+    //Written by Ethan Dastick
+    //Written on Nov 3, 2024 (11/3/2024)
+    //Created a function that appends the IP address to the log file. If no file exists,
+    //a new file is created.
+    //
+    //Change Log:
+    //
+    //************************************************************************
+
+    FILE* logFile = fopen("Log-and-ACL\\NetworkLog.csv", "a");
+    //Opening the file to append a log entry
+    //SE-300-Filewall-Project-Fall-2024\\
+
+    if(!logFile) {
+        // The file did not exist, creating a new one.
+        fclose(logFile);
+
+        logFile = fopen("Log-and-ACL\\NetworkLog.csv", "w");
+
+        fprintf(logFile,"BAZINGA\n");
+        //fprintf(file,"This is your White List File\n ");
+        fclose(logFile);
+        return;
+    }
+
+    fprintf(logFile, "%s\n", IPaddress);
+    //Appending the IP to the file
+
+    fclose(logFile);
+    //Closing the file
 }
 
 void Website_Blacklist() {
@@ -41,7 +77,6 @@ void ReceivePort() {
 void IP_to_Domain() {
     //converts ip address to a domain name
 }
-
 
 void HexToASCII(const char *input) {
     char inputCopy[1000];
@@ -227,13 +262,16 @@ int createWhiteList() {
 
 
 
-    int main(int argc, char *argv[]) {
-        // FindDeviceInfo();
-        // const char *input = "42 6F 6F 62 73"; // Example input
-        const char *input = "FG";
-        //HexToDec(input); // Call the function to process the input
-        //HexToASCII(input);
-        createBlackList();
-        return 0;
-    }
+int main(int argc, char *argv[]) {
+    // FindDeviceInfo();
+    const char *input = "41 65"; // Example input
+    HexToDec(input); // Call the function to process the input
+    HexToASCII(input);
 
+    createBlackList();
+    createWhiteList();
+
+    char FakeIPaddress[] = "192.168.1.1";
+    LogTraffic(FakeIPaddress);
+    return 0;
+}
