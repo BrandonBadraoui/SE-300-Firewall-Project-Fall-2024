@@ -96,6 +96,7 @@ void HexToDec(const char *input) {
     char hex[100]; // Buffer for each hexadecimal number
     int decimal;
     int total = 0; // Variable to accumulate the total decimal value
+    bool invalid = false;
 
     // Create a mutable copy of the input
     char inputCopy[1000];
@@ -128,6 +129,7 @@ void HexToDec(const char *input) {
             } else {
                 // Invalid hex character
                 fprintf(stderr, "Invalid hexadecimal character: %c\n", currentChar);
+                invalid = true;
                 break; // Stop processing this token on error
             }
 
@@ -135,68 +137,103 @@ void HexToDec(const char *input) {
             decimal += value * base;
             base *= 16; // Move to the next power of 16
         }
+            // Print the decimal value
+           if(decimal != 0) {
+               printf("Hex: %s -> Decimal: %d\n", token, decimal);
+           }
 
-        // Print the decimal value
-        printf("Hex: %s -> Decimal: %d\n", token, decimal);
+            //Calc the total
+            total += decimal;
 
-        token = strtok(NULL, " "); // Get the next token
+            token = strtok(NULL, " "); // Get the next token
+
+
+        }
+    if (total != 0){
+        // Print the total sum of all decimal values
+        printf("Total Decimal Value: %d\n", total);
+        }
+}
+
+int createBlackList() {
+    const char *fileName = "BlackList.txt";
+    //Creates a pointer to the file, then opens the file with "fileName" and opens it to write mode
+    FILE *file = fopen(fileName, "w");
+    if (file == NULL) {
+        printf("File does not exist\n");
+        return EXIT_FAILURE; //Terminates the program and informs the operating system that it was unsuccessful
     }
-    // Print the total sum of all decimal values
-    printf("Total Decimal Value: %d\n", total);
+    fprintf(file,"This is your Black List File. Please save this file in an easily accessible location for your convince. \n In the lines below you will write the Domain name of the websites that you wish to block. An example would be 'Google.com' \n Please make sure to write each website on its OWN LINE. \n ");
+    fclose(file);
 }
 
-// int findDeviceInfo() {
-//     char  ip[13], subnet_mask[14];
-
-//     bpf_u_int32 ip_raw; // IP address as an int
-//     bpf_u_int32 subnet_mask_raw; // Subnet Mask as an int
-
-//     char error_buffer[PCAP_ERRBUF_SIZE]; // Size defined in pcap.h
-//     struct in_addr address;
-
-//     //Finds a Device
-//     char *device = pcap_lookupdev(error_buffer); // Name of device
-//     if (device == NULL) {
-//         printf(" %s\n", error_buffer);
-//         return 1;
-//     }
-
-//     /*Get Device Info*/
-//     int lookup_return_code = pcap_lookupnet(device, &ip_raw, &subnet_mask_raw, error_buffer);
-//     if (lookup_return_code == -1) {
-//         printf("%s\n", error_buffer);
-//         return 1;
-//     }
-
-//     // Readable IP
-//     address.s_addr = ip_raw;
-//     strcpy(ip, inet_ntoa(address));
-//     if (inet_ntoa(address) == NULL) {
-//         perror("inet_ntoa"); /* print error */
-//         return 1;
-//     }
-
-//     //Readable subnet mask
-//     address.s_addr = subnet_mask_raw;
-//     snprintf(subnet_mask, sizeof(subnet_mask), inet_ntoa(address));
-//     if (inet_ntoa(address) == NULL) {
-//         perror("inet_ntoa");
-//         return 1;
-//     }
-
-//     printf("Device: %s\n", device);
-//     printf("IP address: %s\n", ip);
-//     printf("Subnet mask: %s\n", subnet_mask);
-
-//     return 0;
-// }
-
-
-
-int main(int argc, char *argv[]) {
-    // FindDeviceInfo();
-    const char *input = "41 65"; // Example input
-    HexToDec(input); // Call the function to process the input
-    HexToASCII(input);
-    return 0;
+int createWhiteList() {
+    const char *fileName = "WhiteList.txt";
+    //Creates a pointer to the file, then opens the file with "fileName" and opens it to write mode
+    FILE *file = fopen(fileName, "w");
+    if (file == NULL) {
+        printf("File does not exist\n");
+        return EXIT_FAILURE; //Terminates the program and informs the operating system that it was unsuccessful
+    }
+    fprintf(file,"This is your White List File. Please save this file in an easily accessible location for your convince. \n In the lines below you will write the Domain name of the websites that you wish to grant clearance from the firewall. An example would be 'Google.com' \n Please make sure to write each website on its OWN LINE. \n ");
+    fclose(file);
 }
+
+    // int findDeviceInfo() {
+    //     char  ip[13], subnet_mask[14];
+
+    //     bpf_u_int32 ip_raw; // IP address as an int
+    //     bpf_u_int32 subnet_mask_raw; // Subnet Mask as an int
+
+    //     char error_buffer[PCAP_ERRBUF_SIZE]; // Size defined in pcap.h
+    //     struct in_addr address;
+
+    //     //Finds a Device
+    //     char *device = pcap_lookupdev(error_buffer); // Name of device
+    //     if (device == NULL) {
+    //         printf(" %s\n", error_buffer);
+    //         return 1;
+    //     }
+
+    //     /*Get Device Info*/
+    //     int lookup_return_code = pcap_lookupnet(device, &ip_raw, &subnet_mask_raw, error_buffer);
+    //     if (lookup_return_code == -1) {
+    //         printf("%s\n", error_buffer);
+    //         return 1;
+    //     }
+
+    //     // Readable IP
+    //     address.s_addr = ip_raw;
+    //     strcpy(ip, inet_ntoa(address));
+    //     if (inet_ntoa(address) == NULL) {
+    //         perror("inet_ntoa"); /* print error */
+    //         return 1;
+    //     }
+
+    //     //Readable subnet mask
+    //     address.s_addr = subnet_mask_raw;
+    //     snprintf(subnet_mask, sizeof(subnet_mask), inet_ntoa(address));
+    //     if (inet_ntoa(address) == NULL) {
+    //         perror("inet_ntoa");
+    //         return 1;
+    //     }
+
+    //     printf("Device: %s\n", device);
+    //     printf("IP address: %s\n", ip);
+    //     printf("Subnet mask: %s\n", subnet_mask);
+
+    //     return 0;
+    // }
+
+
+
+    int main(int argc, char *argv[]) {
+        // FindDeviceInfo();
+        // const char *input = "42 6F 6F 62 73"; // Example input
+        const char *input = "FG";
+        //HexToDec(input); // Call the function to process the input
+        //HexToASCII(input);
+        createBlackList();
+        return 0;
+    }
+
