@@ -121,10 +121,14 @@ void LogTraffic(char IPaddress[])
     //a new file is created.
     //
     //Change Log:
-    //
+    // 11/6/2024 - Ethan Dastick
+    // No direct change to code. Added Log-and-ACL folder to directory and it
+    // magically started working as intended :/
+    // Todo: Make sure this works with an array containing multiple elements;
+    // ie: [IP], [date], [Souce URL]... etc.
     //************************************************************************
 
-    FILE* logFile = fopen("Log-and-ACL\\NetworkLog.csv", "a");
+    FILE* logFile = fopen("..\\Log-and-ACL\\NetworkLog.csv", "a");
     //Opening the file to append a log entry
     //SE-300-Filewall-Project-Fall-2024\\
 
@@ -310,11 +314,11 @@ int createWhiteList() {
 int main(int argc, char *argv[]) {
     // FindDeviceInfo();
     const char *input = "41 65"; // Example input
-    HexToDec(input); // Call the function to process the input
-    HexToASCII(input);
+    //HexToDec(input); // Call the function to process the input
+    //HexToASCII(input);
 
-    createBlackList();
-    createWhiteList();
+    //createBlackList();
+    //createWhiteList();
 
     char FakeIPaddress[] = "192.168.1.1";
     LogTraffic(FakeIPaddress);
