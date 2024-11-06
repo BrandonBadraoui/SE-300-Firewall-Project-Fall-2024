@@ -2,8 +2,101 @@
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <time.h>
 #include <math.h>
+
+/*Linux Bullshit
 //#include <pcap.h>
+#include <netinet/in.h>
+#include <netinet/if_ether.h>
+
+char *device;
+char error_buffer[PCAP_ERRBUF_SIZE]; // Size defined in pcap.h
+
+void PrintPacketInfo(const u_char *packet, struct pcap_pkthdr packet_header) {
+    printf("Packet capture length: %d\n", packet_header.caplen);
+    printf("Packet total length: %d\n", packet_header.len);
+}
+
+void MyPacketHandler(u_char *args, const struct pcap_pkthdr *packet_header, const u_char *packet) {
+    struct ether_header *eth_header; // This forces the compiler to treat the pointer of the packet as a pointer to ether_header
+    eth_header = (struct ether_header *) packet;
+
+    PrintPacketInfo(packet, *packet_header);
+
+    if (ntohs(eth_header->ether_type)== ETHERTYPE_IP) {
+        printf("IP\n");
+    } else if (ntohs(eth_header->ether_type)== ETHERTYPE_ARP)
+        printf("ARP\n");
+    else if (ntohs(eth_header->ether_type)== ETHERTYPE_REVARP)
+        printf("Reverse ARP\n");
+    return;
+}
+
+int findDeviceInfo() {
+    char  ip[13], subnet_mask[14];
+
+    bpf_u_int32 ip_raw; // IP address as an int
+    bpf_u_int32 subnet_mask_raw; // Subnet Mask as an int
+
+    struct in_addr address;
+
+    //Finds a Device
+    device = pcap_lookupdev(error_buffer); // Name of device
+    if (device == NULL) {
+        printf(" %s\n", error_buffer);
+        return 1;
+    }
+
+    //Get Device Info
+    int lookup_return_code = pcap_lookupnet(device, &ip_raw, &subnet_mask_raw, error_buffer);
+    if (lookup_return_code == -1) {
+        printf("%s\n", error_buffer);
+        return 1;
+    }
+
+    // Readable IP
+    address.s_addr = ip_raw;
+    strcpy(ip, inet_ntoa(address));
+
+    //Readable subnet mask
+    address.s_addr = subnet_mask_raw;
+    snprintf(subnet_mask, sizeof(subnet_mask), inet_ntoa(address));
+
+    printf("Device: %s\n", device);
+    printf("IP address: %s\n", ip);
+    printf("Subnet mask: %s\n", subnet_mask);
+
+    return 0;
+}
+
+int LiveCapture() {
+    pcap_t *handle;
+    int snapshot_len = 1028;
+    int promiscuous = 0;
+    int timeout_limit = 10000; // Milliseconds
+
+    //Find device
+    device = pcap_lookupdev(error_buffer);
+    if (device == NULL) {
+        printf("Error finding device: %s\n", error_buffer);
+        return 1;
+    }
+
+    //Open Device
+    handle = pcap_open_live(device, snapshot_len, promiscuous, timeout_limit, error_buffer);
+
+    if (handle == NULL) {
+        fprintf(stderr, "Error opening device %s: %s\n",device, error_buffer);
+        return 2;
+    }
+
+    pcap_loop(handle, 1, MyPacketHandler, NULL);
+
+    pcap_close(handle);
+    return 0;
+}
+*/
 
 #define MAX_TOKENS 1000 // Maximum number of hexadecimal inputs
 
@@ -214,54 +307,6 @@ int createWhiteList() {
     fclose(file);
 }
 
-    // int findDeviceInfo() {
-    //     char  ip[13], subnet_mask[14];
-
-    //     bpf_u_int32 ip_raw; // IP address as an int
-    //     bpf_u_int32 subnet_mask_raw; // Subnet Mask as an int
-
-    //     char error_buffer[PCAP_ERRBUF_SIZE]; // Size defined in pcap.h
-    //     struct in_addr address;
-
-    //     //Finds a Device
-    //     char *device = pcap_lookupdev(error_buffer); // Name of device
-    //     if (device == NULL) {
-    //         printf(" %s\n", error_buffer);
-    //         return 1;
-    //     }
-
-    //     /*Get Device Info*/
-    //     int lookup_return_code = pcap_lookupnet(device, &ip_raw, &subnet_mask_raw, error_buffer);
-    //     if (lookup_return_code == -1) {
-    //         printf("%s\n", error_buffer);
-    //         return 1;
-    //     }
-
-    //     // Readable IP
-    //     address.s_addr = ip_raw;
-    //     strcpy(ip, inet_ntoa(address));
-    //     if (inet_ntoa(address) == NULL) {
-    //         perror("inet_ntoa"); /* print error */
-    //         return 1;
-    //     }
-
-    //     //Readable subnet mask
-    //     address.s_addr = subnet_mask_raw;
-    //     snprintf(subnet_mask, sizeof(subnet_mask), inet_ntoa(address));
-    //     if (inet_ntoa(address) == NULL) {
-    //         perror("inet_ntoa");
-    //         return 1;
-    //     }
-
-    //     printf("Device: %s\n", device);
-    //     printf("IP address: %s\n", ip);
-    //     printf("Subnet mask: %s\n", subnet_mask);
-
-    //     return 0;
-    // }
-
-
-
 int main(int argc, char *argv[]) {
     // FindDeviceInfo();
     const char *input = "41 65"; // Example input
@@ -273,5 +318,11 @@ int main(int argc, char *argv[]) {
 
     char FakeIPaddress[] = "192.168.1.1";
     LogTraffic(FakeIPaddress);
+
+    /* Linux Bullshit
+    findDeviceInfo();
+    LiveCapture();
+    */
+
     return 0;
 }
