@@ -4,6 +4,7 @@
 #include <ctype.h>
 #include <time.h>
 #include <math.h>
+#include <stdbool.h>
 
 //Sha 265 Hash Encoding
 #define uchar unsigned char
@@ -114,6 +115,30 @@ int LiveCapture() {
 */
 
 #define MAX_TOKENS 1000 // Maximum number of hexadecimal inputs
+#define MAX_PACKET_SIZE 100000 //Max number of packets that can be captured
+
+void capturePacket() {
+    const char *command = "sudo tcpdump -i ens33 -x";
+    int ret = system(command);
+    if(ret == -1) {
+        perror("Failed to capture packet\n");
+        exit(EXIT_FAILURE);
+    }
+    // FILE *tcpdump_output = popen(command, "r");
+    // if(tcpdump_output == NULL) {
+    //     perror("Failed to create packet funnel");
+    //     exit(EXIT_FAILURE);
+    // }
+    // char buffer[MAX_PACKET_SIZE];
+    // while(fgets(buffer, sizeof(buffer), tcpdump_output) != NULL) {
+    //     printf("Captured Packets: %s", buffer);
+    // }
+    // fclose(tcpdump_output);
+}
+
+int getIP(char *ip) {
+
+}
 
 void ReadPacket() { //will need to incorperate Tcdump as Tcpdump provides hexadecimal outputs
 
@@ -307,6 +332,40 @@ void LogTraffic(char IPaddress[])
     //Closing the file
 }
 
+void spacePackets(const char *input) {
+    int length = strlen(input);
+    int i = 0;
+
+    while (i < length) {
+        // If we encounter "0x", skip everything until we reach a ":"
+        if (i + 1 < length && input[i] == '0' && input[i + 1] == 'x') {
+            // Skip over "0x" and everything until we find a colon ":"
+            while (i < length && input[i] != ':') {
+                i++;
+            }
+            i++; // Skip over the colon as well
+        } else if (isspace(input[i]) || !isxdigit(input[i])) {
+            // Skip spaces and non-hexadecimal characters
+            i++;
+        } else {
+            // Print the current valid pair of hexadecimal characters
+            printf("%c%c", input[i], input[i + 1]);
+
+            // Add a space after each pair unless it's the last pair
+            if (i + 2 < length) {
+                printf(" ");
+            }
+
+            // Skip the second character of the current pair
+            i += 2; // Move forward to the next pair
+        }
+    }
+
+    printf("\n");  // End the output with a newline
+}
+
+
+
 void HexToASCII(const char *input) {
     char inputCopy[1000];
     strcpy(inputCopy, input);
@@ -443,17 +502,75 @@ int createWhiteList() {
     fclose(file);
 }
 
+    // int findDeviceInfo() {
+    //     char  ip[13], subnet_mask[14];
+
+    //     bpf_u_int32 ip_raw; // IP address as an int
+    //     bpf_u_int32 subnet_mask_raw; // Subnet Mask as an int
+
+    //     char error_buffer[PCAP_ERRBUF_SIZE]; // Size defined in pcap.h
+    //     struct in_addr address;
+
+    //     //Finds a Device
+    //     char *device = pcap_lookupdev(error_buffer); // Name of device
+    //     if (device == NULL) {
+    //         printf(" %s\n", error_buffer);
+    //         return 1;
+    //     }
+
+    //     /*Get Device Info*/
+    //     int lookup_return_code = pcap_lookupnet(device, &ip_raw, &subnet_mask_raw, error_buffer);
+    //     if (lookup_return_code == -1) {
+    //         printf("%s\n", error_buffer);
+    //         return 1;
+    //     }
+
+    //     // Readable IP
+    //     address.s_addr = ip_raw;
+    //     strcpy(ip, inet_ntoa(address));
+    //     if (inet_ntoa(address) == NULL) {
+    //         perror("inet_ntoa"); /* print error */
+    //         return 1;
+    //     }
+
+    //     //Readable subnet mask
+    //     address.s_addr = subnet_mask_raw;
+    //     snprintf(subnet_mask, sizeof(subnet_mask), inet_ntoa(address));
+    //     if (inet_ntoa(address) == NULL) {
+    //         perror("inet_ntoa");
+    //         return 1;
+    //     }
+
+    //     printf("Device: %s\n", device);
+    //     printf("IP address: %s\n", ip);
+    //     printf("Subnet mask: %s\n", subnet_mask);
+
+    //     return 0;
+    // }
+
+
+    //
+    // int main(int argc, char *argv[]) {
+    //     // FindDeviceInfo();
+    //     const char *input = "0a 21 BC D8"; // Example input
+    //     printf("Input: %s\n", input);
+    //     HexToDec(input); // Call the function to process the input
+    //     printf("ASCII Output: \n");
+    //     HexToASCII(input);
+    //     //createBlackList();
+    //     return 0;
+
 int main(int argc, char *argv[]) {
     // FindDeviceInfo();
-    const char *input = "41 65"; // Example input
-    //HexToDec(input); // Call the function to process the input
-    //HexToASCII(input);
+    // const char *input = "c0 a8 ce 82"; // Example input 22 a0 90 bf
+    // HexToDec(input); // Call the function to process the input
+    // HexToASCII(input);
 
     //createBlackList();
     //createWhiteList();
 
-    char FakeIPaddress[] = "192.168.1.1";
-    LogTraffic(FakeIPaddress);
+    // char FakeIPaddress[] = "192.168.1.1";
+    // LogTraffic(FakeIPaddress);
 
 	printf("Hashed: %s\n", SHA256(FakeIPaddress));
 	printf("Hashed: %s\n", SHA256("Hello World!"));
@@ -463,5 +580,8 @@ int main(int argc, char *argv[]) {
     LiveCapture();
     */
 
+
+    spacePackets("4500 0152 72c7 0000 8011 a8fd c0a8 ce02 c0a8 ce82 0035 8ad6 013e fffc 0fe2 8180 0001 0002 0003 0005 0235 3603 3139 3003 3132 3503 3138 3507 696e 2d61 6464 7204 6172 7061 0000 0c00 01c0 0c00 0c00 0100 0000 0500 230a 7072 6f64 2d6e 7470 2d33 046e 7470 3103 7073 3509 6361 6e6f 6e69 6361 6c03 636f 6d00 c00c 000c 0001 0000 0005 0023 0a70 726f 642d 6e74 702d 3304 6e74 7034 0370 7335 0963 616e 6f6e 6963 616c 0363 6f6d 00c0 0f00 0200 0100 0000 0500 1303 6e73 3109 6361 6e6f 6e69 6361 6c03 636f 6d00 c00f 0002 0001 0000 0005 0006 036e 7333 c09b c00f 0002 0001 0000 0005 0006 036e 7332 c09b c097 0001 0001 0000 0005 0004 b97d be41 c0b6 0001 0001 0000 0005 0004 5bbd 5b8b c0c8 0001 0001 0000 0005 0004 b97d be42 c097 001c 0001 0000 0005 0010 2620 002d 4000 0001 0000 0000 0000 0043 c0c8 001c 0001 0000 0005 0010 2620 002d 4000 0001 0000 0000 0000 0044");
     return 0;
 }
+
