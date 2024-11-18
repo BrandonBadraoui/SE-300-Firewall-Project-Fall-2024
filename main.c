@@ -29,16 +29,18 @@ void capturePacket() {
         perror("Failed to capture packet\n");
         exit(EXIT_FAILURE);
     }
-    // FILE *tcpdump_output = popen(command, "r");
-    // if(tcpdump_output == NULL) {
-    //     perror("Failed to create packet funnel");
-    //     exit(EXIT_FAILURE);
-    // }
-    // char buffer[MAX_PACKET_SIZE];
-    // while(fgets(buffer, sizeof(buffer), tcpdump_output) != NULL) {
-    //     printf("Captured Packets: %s", buffer);
-    // }
-    // fclose(tcpdump_output);
+}
+
+void BlockDomain(char *domain) {
+    char *commandFilter=malloc(256);
+    sprintf(commandFilter,"sudo iptables -A OUTPUT -p tcp -m string --string %s --algo kmp -j REJECT", domain);
+    const char *commandSave = "sudo iptables-save";
+    int ret1 = system(commandFilter);
+    int ret2 = system(commandSave);
+    if (ret1 == -1) {
+        perror("Failed to block packet");
+        exit(EXIT_FAILURE);
+    }
 }
 
 int getIP(char *ip) {
@@ -192,7 +194,6 @@ char *SHA256(char *data) {
     return hashStr;
 }
 
-
 void LogTraffic(char IPaddress[]) {
     //************************************************************************
     //Written by Ethan Dastick
@@ -261,7 +262,6 @@ void spacePackets(const char *input) {
 
     printf("\n"); // End the output with a newline
 }
-
 
 void HexToASCII(const char *input) {
     char inputCopy[1000];
@@ -409,14 +409,16 @@ int main(int argc, char *argv[]) {
     //createBlackList();
     //createWhiteList();
 
-    char FakeIPaddress[] = "192.168.1.1";
-    LogTraffic(FakeIPaddress);
+    // char FakeIPaddress[] = "192.168.1.1";
+    // LogTraffic(FakeIPaddress);
 
-    printf("Hashed: %s\n", SHA256(FakeIPaddress));
-    printf("Hashed: %s\n", SHA256("Hello World!"));
-    printf("Hashed: %s\n", SHA256("Test2"));
+    //printf("Hashed: %s\n", SHA256(FakeIPaddress));
+   // printf("Hashed: %s\n", SHA256("Hello World!"));
+    //printf("Hashed: %s\n", SHA256("Test2"));
 
-    spacePackets(
-        "4500 0152 72c7 0000 8011 a8fd c0a8 ce02 c0a8 ce82 0035 8ad6 013e fffc 0fe2 8180 0001 0002 0003 0005 0235 3603 3139 3003 3132 3503 3138 3507 696e 2d61 6464 7204 6172 7061 0000 0c00 01c0 0c00 0c00 0100 0000 0500 230a 7072 6f64 2d6e 7470 2d33 046e 7470 3103 7073 3509 6361 6e6f 6e69 6361 6c03 636f 6d00 c00c 000c 0001 0000 0005 0023 0a70 726f 642d 6e74 702d 3304 6e74 7034 0370 7335 0963 616e 6f6e 6963 616c 0363 6f6d 00c0 0f00 0200 0100 0000 0500 1303 6e73 3109 6361 6e6f 6e69 6361 6c03 636f 6d00 c00f 0002 0001 0000 0005 0006 036e 7333 c09b c00f 0002 0001 0000 0005 0006 036e 7332 c09b c097 0001 0001 0000 0005 0004 b97d be41 c0b6 0001 0001 0000 0005 0004 5bbd 5b8b c0c8 0001 0001 0000 0005 0004 b97d be42 c097 001c 0001 0000 0005 0010 2620 002d 4000 0001 0000 0000 0000 0043 c0c8 001c 0001 0000 0005 0010 2620 002d 4000 0001 0000 0000 0000 0044");
+    //spacePackets("4500 0152 72c7 0000 8011 a8fd c0a8 ce02 c0a8 ce82 0035 8ad6 013e fffc 0fe2 8180 0001 0002 0003 0005 0235 3603 3139 3003 3132 3503 3138 3507 696e 2d61 6464 7204 6172 7061 0000 0c00 01c0 0c00 0c00 0100 0000 0500 230a 7072 6f64 2d6e 7470 2d33 046e 7470 3103 7073 3509 6361 6e6f 6e69 6361 6c03 636f 6d00 c00c 000c 0001 0000 0005 0023 0a70 726f 642d 6e74 702d 3304 6e74 7034 0370 7335 0963 616e 6f6e 6963 616c 0363 6f6d 00c0 0f00 0200 0100 0000 0500 1303 6e73 3109 6361 6e6f 6e69 6361 6c03 636f 6d00 c00f 0002 0001 0000 0005 0006 036e 7333 c09b c00f 0002 0001 0000 0005 0006 036e 7332 c09b c097 0001 0001 0000 0005 0004 b97d be41 c0b6 0001 0001 0000 0005 0004 5bbd 5b8b c0c8 0001 0001 0000 0005 0004 b97d be42 c097 001c 0001 0000 0005 0010 2620 002d 4000 0001 0000 0000 0000 0043 c0c8 001c 0001 0000 0005 0010 2620 002d 4000 0001 0000 0000 0000 0044");
+    BlockDomain("google.com");
+    //capturePacket();
+    
     return 0;
 }
