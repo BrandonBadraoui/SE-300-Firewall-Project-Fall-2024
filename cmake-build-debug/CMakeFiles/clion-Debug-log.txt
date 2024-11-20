@@ -1,4 +1,4 @@
-"C:\Program Files\JetBrains\CLion 2024.2.2\bin\cmake\win\x64\bin\cmake.exe" -DCMAKE_BUILD_TYPE=Debug -G "MinGW Makefiles" -S C:\Users\jct50\CLionProjects\SE-300-Firewall-Project-Fall-2024 -B C:\Users\jct50\CLionProjects\SE-300-Firewall-Project-Fall-2024\cmake-build-debug
--- Configuring done (0.7s)
--- Generating done (0.1s)
--- Build files have been written to: C:/Users/jct50/CLionProjects/SE-300-Firewall-Project-Fall-2024/cmake-build-debug
+/home/brandon/.cache/JetBrains/RemoteDev/dist/3f9fdcd33c262_CLion-2024.2.3/bin/cmake/linux/x64/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "Unix Makefiles" -S "/home/brandon/CLionProjects/Working project" -B "/home/brandon/CLionProjects/Working project/cmake-build-debug"
+-- Configuring done (0.0s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/brandon/CLionProjects/Working project/cmake-build-debug
