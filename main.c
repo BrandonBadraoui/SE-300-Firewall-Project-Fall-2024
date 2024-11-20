@@ -5,6 +5,8 @@
 #include <time.h>
 #include <math.h>
 #include <stdbool.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 //Sha 265 Hash Encoding
 #define uchar unsigned char
@@ -18,130 +20,53 @@
 #define EP1(x) (ROTRIGHT(x,6) ^ ROTRIGHT(x,11) ^ ROTRIGHT(x,25))
 #define SIG0(x) (ROTRIGHT(x,7) ^ ROTRIGHT(x,18) ^ ((x) >> 3))
 #define SIG1(x) (ROTRIGHT(x,17) ^ ROTRIGHT(x,19) ^ ((x) >> 10))
-
-
-
-/*Linux Bullshit
-//#include <pcap.h>
-#include <netinet/in.h>
-#include <netinet/if_ether.h>
-
-char *device;
-char error_buffer[PCAP_ERRBUF_SIZE]; // Size defined in pcap.h
-
-void PrintPacketInfo(const u_char *packet, struct pcap_pkthdr packet_header) {
-    printf("Packet capture length: %d\n", packet_header.caplen);
-    printf("Packet total length: %d\n", packet_header.len);
-}
-
-void MyPacketHandler(u_char *args, const struct pcap_pkthdr *packet_header, const u_char *packet) {
-    struct ether_header *eth_header; // This forces the compiler to treat the pointer of the packet as a pointer to ether_header
-    eth_header = (struct ether_header *) packet;
-
-    PrintPacketInfo(packet, *packet_header);
-
-    if (ntohs(eth_header->ether_type)== ETHERTYPE_IP) {
-        printf("IP\n");
-    } else if (ntohs(eth_header->ether_type)== ETHERTYPE_ARP)
-        printf("ARP\n");
-    else if (ntohs(eth_header->ether_type)== ETHERTYPE_REVARP)
-        printf("Reverse ARP\n");
-    return;
-}
-
-int findDeviceInfo() {
-    char  ip[13], subnet_mask[14];
-
-    bpf_u_int32 ip_raw; // IP address as an int
-    bpf_u_int32 subnet_mask_raw; // Subnet Mask as an int
-
-    struct in_addr address;
-
-    //Finds a Device
-    device = pcap_lookupdev(error_buffer); // Name of device
-    if (device == NULL) {
-        printf(" %s\n", error_buffer);
-        return 1;
-    }
-
-    //Get Device Info
-    int lookup_return_code = pcap_lookupnet(device, &ip_raw, &subnet_mask_raw, error_buffer);
-    if (lookup_return_code == -1) {
-        printf("%s\n", error_buffer);
-        return 1;
-    }
-
-    // Readable IP
-    address.s_addr = ip_raw;
-    strcpy(ip, inet_ntoa(address));
-
-    //Readable subnet mask
-    address.s_addr = subnet_mask_raw;
-    snprintf(subnet_mask, sizeof(subnet_mask), inet_ntoa(address));
-
-    printf("Device: %s\n", device);
-    printf("IP address: %s\n", ip);
-    printf("Subnet mask: %s\n", subnet_mask);
-
-    return 0;
-}
-
-int LiveCapture() {
-    pcap_t *handle;
-    int snapshot_len = 1028;
-    int promiscuous = 0;
-    int timeout_limit = 10000; // Milliseconds
-
-    //Find device
-    device = pcap_lookupdev(error_buffer);
-    if (device == NULL) {
-        printf("Error finding device: %s\n", error_buffer);
-        return 1;
-    }
-
-    //Open Device
-    handle = pcap_open_live(device, snapshot_len, promiscuous, timeout_limit, error_buffer);
-
-    if (handle == NULL) {
-        fprintf(stderr, "Error opening device %s: %s\n",device, error_buffer);
-        return 2;
-    }
-
-    pcap_loop(handle, 1, MyPacketHandler, NULL);
-
-    pcap_close(handle);
-    return 0;
-}
-*/
-
 #define MAX_TOKENS 1000 // Maximum number of hexadecimal inputs
 #define MAX_PACKET_SIZE 100000 //Max number of packets that can be captured
 
 void capturePacket() {
-    const char *command = "sudo tcpdump -i ens33 -x";
-    int ret = system(command);
+	const char *command = "sudo tcpdump -xqli ens33 >> tcpdump.txt"; //appends the output to the file
+
+	int ret = system(command);
     if(ret == -1) {
-        perror("Failed to capture packet\n");
-        exit(EXIT_FAILURE);
+	    perror("Failed to capture packets\n");
+    	exit(EXIT_FAILURE);
     }
-    // FILE *tcpdump_output = popen(command, "r");
-    // if(tcpdump_output == NULL) {
-    //     perror("Failed to create packet funnel");
-    //     exit(EXIT_FAILURE);
-    // }
-    // char buffer[MAX_PACKET_SIZE];
-    // while(fgets(buffer, sizeof(buffer), tcpdump_output) != NULL) {
-    //     printf("Captured Packets: %s", buffer);
-    // }
-    // fclose(tcpdump_output);
 }
 
 int getIP(char *ip) {
 
 }
 
-void ReadPacket() { //will need to incorperate Tcdump as Tcpdump provides hexadecimal outputs
+void ReadPacket() {
 
+}
+
+void readInRealTime(const char *file_name) {
+	FILE *fp;
+	char buffer[16777216]; //2^24 Adjust size as needed
+	long last_position = 0;
+
+	while (1) {
+		fp = fopen(file_name, "a+");
+		if (fp == NULL) {
+			perror("Failed to open file");
+			exit(1);
+		}
+
+		// Move the file pointer to the last read position
+		fseek(fp, last_position, SEEK_SET);
+
+		// Read new lines added to the file
+		while (fgets(buffer, sizeof(buffer), fp) != NULL) {
+			 //This is where we would add the functionality of analyzing the packets
+		}
+
+		// Update the last read position
+		last_position = ftell(fp);
+
+		fclose(fp);
+		sleep(1); // Adjust to control polling frequency
+	}
 }
 
 //Using code from https://www.programmingalgorithms.com/algorithm/sha256/c/
@@ -502,63 +427,6 @@ int createWhiteList() {
     fclose(file);
 }
 
-    // int findDeviceInfo() {
-    //     char  ip[13], subnet_mask[14];
-
-    //     bpf_u_int32 ip_raw; // IP address as an int
-    //     bpf_u_int32 subnet_mask_raw; // Subnet Mask as an int
-
-    //     char error_buffer[PCAP_ERRBUF_SIZE]; // Size defined in pcap.h
-    //     struct in_addr address;
-
-    //     //Finds a Device
-    //     char *device = pcap_lookupdev(error_buffer); // Name of device
-    //     if (device == NULL) {
-    //         printf(" %s\n", error_buffer);
-    //         return 1;
-    //     }
-
-    //     /*Get Device Info*/
-    //     int lookup_return_code = pcap_lookupnet(device, &ip_raw, &subnet_mask_raw, error_buffer);
-    //     if (lookup_return_code == -1) {
-    //         printf("%s\n", error_buffer);
-    //         return 1;
-    //     }
-
-    //     // Readable IP
-    //     address.s_addr = ip_raw;
-    //     strcpy(ip, inet_ntoa(address));
-    //     if (inet_ntoa(address) == NULL) {
-    //         perror("inet_ntoa"); /* print error */
-    //         return 1;
-    //     }
-
-    //     //Readable subnet mask
-    //     address.s_addr = subnet_mask_raw;
-    //     snprintf(subnet_mask, sizeof(subnet_mask), inet_ntoa(address));
-    //     if (inet_ntoa(address) == NULL) {
-    //         perror("inet_ntoa");
-    //         return 1;
-    //     }
-
-    //     printf("Device: %s\n", device);
-    //     printf("IP address: %s\n", ip);
-    //     printf("Subnet mask: %s\n", subnet_mask);
-
-    //     return 0;
-    // }
-
-
-    //
-    // int main(int argc, char *argv[]) {
-    //     // FindDeviceInfo();
-    //     const char *input = "0a 21 BC D8"; // Example input
-    //     printf("Input: %s\n", input);
-    //     HexToDec(input); // Call the function to process the input
-    //     printf("ASCII Output: \n");
-    //     HexToASCII(input);
-    //     //createBlackList();
-    //     return 0;
 
 int main(int argc, char *argv[]) {
     // FindDeviceInfo();
@@ -566,22 +434,14 @@ int main(int argc, char *argv[]) {
     // HexToDec(input); // Call the function to process the input
     // HexToASCII(input);
 
-    //createBlackList();
-    //createWhiteList();
+	// printf("Hashed: %s\n", SHA256(FakeIPaddress));
+	// printf("Hashed: %s\n", SHA256("Hello World!"));
+	// printf("Hashed: %s\n", SHA256("Test2"));
 
-    // char FakeIPaddress[] = "192.168.1.1";
-    // LogTraffic(FakeIPaddress);
+	// spacePackets("4500 0152 72c7 0000 8011 a8fd c0a8 ce02 c0a8 ce82 0035 8ad6 013e fffc 0fe2 8180 0001 0002 0003 0005 0235 3603 3139 3003 3132 3503 3138 3507 696e 2d61 6464 7204 6172 7061 0000 0c00 01c0 0c00 0c00 0100 0000 0500 230a 7072 6f64 2d6e 7470 2d33 046e 7470 3103 7073 3509 6361 6e6f 6e69 6361 6c03 636f 6d00 c00c 000c 0001 0000 0005 0023 0a70 726f 642d 6e74 702d 3304 6e74 7034 0370 7335 0963 616e 6f6e 6963 616c 0363 6f6d 00c0 0f00 0200 0100 0000 0500 1303 6e73 3109 6361 6e6f 6e69 6361 6c03 636f 6d00 c00f 0002 0001 0000 0005 0006 036e 7333 c09b c00f 0002 0001 0000 0005 0006 036e 7332 c09b c097 0001 0001 0000 0005 0004 b97d be41 c0b6 0001 0001 0000 0005 0004 5bbd 5b8b c0c8 0001 0001 0000 0005 0004 b97d be42 c097 001c 0001 0000 0005 0010 2620 002d 4000 0001 0000 0000 0000 0043 c0c8 001c 0001 0000 0005 0010 2620 002d 4000 0001 0000 0000 0000 0044");
 
-	printf("Hashed: %s\n", SHA256(FakeIPaddress));
-	printf("Hashed: %s\n", SHA256("Hello World!"));
-	printf("Hashed: %s\n", SHA256("Test2"));
-    /* Linux Bullshit
-    findDeviceInfo();
-    LiveCapture();
-    */
-
-
-    spacePackets("4500 0152 72c7 0000 8011 a8fd c0a8 ce02 c0a8 ce82 0035 8ad6 013e fffc 0fe2 8180 0001 0002 0003 0005 0235 3603 3139 3003 3132 3503 3138 3507 696e 2d61 6464 7204 6172 7061 0000 0c00 01c0 0c00 0c00 0100 0000 0500 230a 7072 6f64 2d6e 7470 2d33 046e 7470 3103 7073 3509 6361 6e6f 6e69 6361 6c03 636f 6d00 c00c 000c 0001 0000 0005 0023 0a70 726f 642d 6e74 702d 3304 6e74 7034 0370 7335 0963 616e 6f6e 6963 616c 0363 6f6d 00c0 0f00 0200 0100 0000 0500 1303 6e73 3109 6361 6e6f 6e69 6361 6c03 636f 6d00 c00f 0002 0001 0000 0005 0006 036e 7333 c09b c00f 0002 0001 0000 0005 0006 036e 7332 c09b c097 0001 0001 0000 0005 0004 b97d be41 c0b6 0001 0001 0000 0005 0004 5bbd 5b8b c0c8 0001 0001 0000 0005 0004 b97d be42 c097 001c 0001 0000 0005 0010 2620 002d 4000 0001 0000 0000 0000 0043 c0c8 001c 0001 0000 0005 0010 2620 002d 4000 0001 0000 0000 0000 0044");
-    return 0;
+	capturePacket();
+	readInRealTime("tcpdump.txt");
+	return 0;
 }
 
