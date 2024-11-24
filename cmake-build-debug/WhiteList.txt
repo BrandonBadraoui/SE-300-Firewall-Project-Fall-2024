@@ -1,0 +1,4 @@
+This is your White List File. Please save this file in an easily accessible location for your convince. 
+ In the lines below you will write the Domain name of the websites that you wish to grant clearance from the firewall. An example would be 'Google.com' 
+ Please make sure to write each website on its OWN LINE. 
+ 
