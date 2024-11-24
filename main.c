@@ -51,7 +51,7 @@ void ReadPacket() {
 }
 
 //Using code from https://www.programmingalgorithms.com/algorithm/sha256/c/
-// This code is used to make Hash Encoding work
+//This code is used to make Hash Encoding work
 typedef struct {
     uchar data[64];
     uint datalen;
@@ -194,10 +194,11 @@ char *SHA256(char *data) {
     return hashStr;
 }
 
-void LogTraffic(char IPaddress[]) {
+void LogTraffic(char IPaddress[])
+{
     //************************************************************************
-    //Written by Ethan Dastick
-    //Written on Nov 3, 2024 (11/3/2024)
+    //Author: Ethan Dastick
+    //Created: Nov 3, 2024 (11/3/2024)
     //Created a function that appends the IP address to the log file. If no file exists,
     //a new file is created.
     //
@@ -312,7 +313,21 @@ void HexToASCII(const char *input) {
     }
 }
 
-void HexToDec(const char *input) {
+int HexToDec(const char *input) {
+    //************************************************************************
+    // Author: Cole Turner
+    // Created: Oct, 2024
+    //The function converts Hex-Pairs (i.e. "AE 0F 23 12") and converts them to
+    //their decmial values
+    //
+    //
+    //
+    //Change Log:
+    // Ethan Dastick (Nov 24, 2024)
+    // Updated the function to return the number once it has been converted, or
+    // the sum if multiple hex pairs are sent.
+    //************************************************************************
+
     char hex[100]; // Buffer for each hexadecimal number
     int decimal;
     int total = 0; // Variable to accumulate the total decimal value
@@ -359,6 +374,11 @@ void HexToDec(const char *input) {
         }
         // Print the decimal value
         if (decimal != 0) {
+            if(strlen(input) == 2) {
+                //Added by Ethan Dastick Nov, 24, 2024
+                //If the hex is only 2 digits long, return the converted value immediatly
+                return decimal;
+            }
             printf("Hex: %s -> Decimal: %d\n", token, decimal);
         }
 
@@ -370,7 +390,135 @@ void HexToDec(const char *input) {
     if (total != 0) {
         // Print the total sum of all decimal values
         printf("Total Decimal Value: %d\n", total);
+        return total; // Added by Ethan Dastick to return the total sum of all hex pairs
     }
+    return -1; //Returns -1 if there was an error - Added by Ethan Dastick
+}
+
+char *truncateSubstring(int len, char string[], bool removeSpace)
+{
+    //************************************************************************
+    // Author: Ethan Dastick
+    // Created: Nov 23, 2024
+    //The function creates a substring out of the first len characters of string
+    //It then removes the first len characters from string
+    //If removeSpace is set to true, an additional character will be removed from
+    //the string if its first char is a space ' '.
+    //
+    //Change Log:
+    //
+    //************************************************************************
+
+    //Pre-allocating substring variable
+    char *substring = malloc(len);
+
+    //Copying the first len characters from string to substring
+    for(int i = 0; i < len; i++){
+        substring[i] = string[i];
+    }
+    //Adding the end character
+    substring[len] = '\000';
+
+    //If the user wants the first char of the string to not be a space, adapts len to remove the first space if it is a space
+    if(removeSpace && string[len] == ' ')
+        len++;
+    //Removing the first len characters from string (Taking advantage of reference variable passing
+    if(strlen(string) <= len)
+        string[0] = '\000';
+    else {
+        for(int i = 0; i < strlen(string)-len; i++)
+            string[i] = string[i+len];
+
+        string[strlen(string)-len] = '\000';
+    }
+
+    //Returning the substring. The shortened string is returned by default as it was passed by ref.
+    return substring;
+}
+
+char *Hex2IP(const char FourHexPair[]) {
+    //************************************************************************
+    // Author: Ethan Dastick
+    // Created: Nov 24, 2024
+    //The function converts a 4 Hex-Pair (i.e. "AE 0F 23 12") and converts it
+    //pair-by-pair and formats it to a proper IP address
+    //
+    //
+    //
+    //Change Log:
+    //
+    //************************************************************************
+
+    char *IP = malloc(16);
+    //char IP2[3+3+3+3+1+1+1+1];
+    int currentIndex = 0;
+    for(int i = 0; i < 4; i++) {
+        //printf("%d", HexToDec(truncateSubstring(2, FourHexPair, true)));
+        char converted[3];
+        sprintf(converted, "%d",HexToDec(truncateSubstring(2, FourHexPair, true)));
+        for(int l = 0; l <= strlen(converted); l++) {
+            if(l != strlen(converted))
+                IP[currentIndex] = converted[l];
+            else if(i != 3)
+                IP[currentIndex] = '.';
+            currentIndex++;
+        }
+        //for(int j = i*4; j < (i+1)*4; j++)
+        //    if(j != 3)
+        //        IP[j] = converted[j-(i*4)];
+        //    else if(i != 3)
+        //        IP[j] = '.';
+        //strcat(IP, converted);
+        //if(i != 3)
+        //    strcat(IP, ".");
+    }
+    IP[currentIndex-1] = '\000';
+    return IP;
+}
+
+void decodePacket(char *packet[]) {
+    //************************************************************************
+    // Author: Ethan Dastick
+    // Created: Nov 23, 2024
+    //The function splits a packet into the usable parts of its header
+    //packet MUST be in HEX pair format with spaces seperating each hex pair.
+    //
+    //
+    //Change Log:
+    //
+    //************************************************************************
+
+
+    //Removing data - Only observing the packet header
+    // Total header length is 32 bits * 6 rows
+    // Each hex pair has 8 bits of data
+    // Therefore the entire header should consist of the first 24 hex pairs
+    // Accounting for spaces, the total number of chars should be (24*2) + (24-1) = 71
+    if(strlen(packet) > 71)
+        packet[71] = nullptr;
+    else
+        return;
+
+    //To anyone editing the lengths of the headers: Note that a hex pair (two characters) is 8 bits
+    //This function expects that spaces seperate the hex pairs. For 16 bits, you would need 4 characters
+    //for the two hex pairs plus 1 space, totaling 5 characters total.
+	char* VersionAndHeaderLength = truncateSubstring(2, packet, true); //Version: 4 Bits HeaderLength: 4 bits
+    char* ToS = truncateSubstring(2, packet, true);//ToS: 8 Bits (One Hex Pair)
+	char* TotalLen = truncateSubstring(5, packet, true);//Total Length: 16 Bits -> 2 Hex Pairs
+	char* Ident = truncateSubstring(5, packet, true);//Ident: 16 Bits -> 2 Hex Pairs
+	char* FlagsAndFragOffset = truncateSubstring(5, packet, true);//Flags: 4 Bits; FragmentOffset: 12 bits -> 2 hex Pairs
+	char* TimeToLive = truncateSubstring(2, packet, true); // TTL: 8 Bits -> 1 Hex pair
+	char* Protocol = truncateSubstring(2, packet, true); //Protocal: 8 Bits -> 1 Hex Pair
+	char* HeaderChecksum = truncateSubstring(5, packet, true); //Checksum: 16 Bits -> 2 Hex Pair
+	char* SourceAddress = truncateSubstring(11, packet, true); //Source Addy: 32 Bits -> 4 Hex Pair (8char + 3 space)
+	char* DestinationAddress = truncateSubstring(11, packet, true);//Destination Addy: 32 Bits -> 4 Hex Pair (8char + 3 space)
+
+    printf("This is the Source Address Hex: %s\n", SourceAddress);
+    printf("This is the Destination Address Hex: %s\n", DestinationAddress);
+
+    printf("The readable source IP is: %s\n", Hex2IP(SourceAddress));
+    printf("The readable destination IP is: %s\n", Hex2IP(DestinationAddress));
+    //HexToDec(SourceAddress);
 }
 
 int createBlackList() {
@@ -402,23 +550,82 @@ int createWhiteList() {
 }
 
 int main(int argc, char *argv[]) {
-    // const char *input = "c0 a8 ce 82"; // Example input 22 a0 90 bf
-    // HexToDec(input); // Call the function to process the input
-    // HexToASCII(input);
+
+    //const char *input = "c0 a8 ce 82"; // Example input 22 a0 90 bf
+    //HexToDec(input); // Call the function to process the input
+    //HexToASCII(input);
 
     //createBlackList();
     //createWhiteList();
 
-    // char FakeIPaddress[] = "192.168.1.1";
-    // LogTraffic(FakeIPaddress);
+    //char FakeIPaddress[] = "192.168.1.1";
+    //LogTraffic(FakeIPaddress);
+
+	//printf("Hashed: %s\n", SHA256(FakeIPaddress));
+	//printf("Hashed: %s\n", SHA256("Hello World!"));
+	//printf("Hashed: %s\n", SHA256("Test2"));
+    /*Linux Bullshit
+    findDeviceInfo();
+	LiveCapture();
+    */
 
     //printf("Hashed: %s\n", SHA256(FakeIPaddress));
-   // printf("Hashed: %s\n", SHA256("Hello World!"));
+    //char* hashed = SHA256(FakeIPaddress);
+    //printf("Hashed: %s\n", hashed);
+    //printf("Hashed: %s\n", SHA256("Hello World!"));
     //printf("Hashed: %s\n", SHA256("Test2"));
 
     //spacePackets("4500 0152 72c7 0000 8011 a8fd c0a8 ce02 c0a8 ce82 0035 8ad6 013e fffc 0fe2 8180 0001 0002 0003 0005 0235 3603 3139 3003 3132 3503 3138 3507 696e 2d61 6464 7204 6172 7061 0000 0c00 01c0 0c00 0c00 0100 0000 0500 230a 7072 6f64 2d6e 7470 2d33 046e 7470 3103 7073 3509 6361 6e6f 6e69 6361 6c03 636f 6d00 c00c 000c 0001 0000 0005 0023 0a70 726f 642d 6e74 702d 3304 6e74 7034 0370 7335 0963 616e 6f6e 6963 616c 0363 6f6d 00c0 0f00 0200 0100 0000 0500 1303 6e73 3109 6361 6e6f 6e69 6361 6c03 636f 6d00 c00f 0002 0001 0000 0005 0006 036e 7333 c09b c00f 0002 0001 0000 0005 0006 036e 7332 c09b c097 0001 0001 0000 0005 0004 b97d be41 c0b6 0001 0001 0000 0005 0004 5bbd 5b8b c0c8 0001 0001 0000 0005 0004 b97d be42 c097 001c 0001 0000 0005 0010 2620 002d 4000 0001 0000 0000 0000 0043 c0c8 001c 0001 0000 0005 0010 2620 002d 4000 0001 0000 0000 0000 0044");
-    BlockDomain("google.com");
-    //capturePacket();
-    
+    //BlockDomain("google.com");
+    //capturePacket()
+
+
+    //Testing the substring function
+    /*
+    const char test[] = "Te s2";
+    //const char test2 = ' ';
+    //double num = strcmp(test, "Te st");
+    //bool num2 = test[2] == ' ';
+    //printf("%.2hhd\n", num2);
+    //printf(shortenString(test, 2));
+	//test = test[2:3];
+    char* newitem = truncateSubstring(9, test, true);
+    printf("Main Substring Output: %s\n", newitem);
+    printf("Main Input Output: %s\n", test);
+    */
+
+    //Testing additions to Hex2Dec function
+    //char test[] = "AE G";
+    //printf("In Main after Function: %d\n", HexToDec(test));
+
+    //Testing decodePacket function
+    char fakePacket[] = "08 00 37 15 E6 BC 00 12 3F 4A 33 D2 08 00 45 00 00 48 AA 1D 00 00 80 11 11 CA AC 1F 13 36 AC 1F 13 49 3E 30 00 A1 00 34 FA 4E 30 2A 02 01 00 04 06 70 75 62 6C 69 63 A0 1D 02 01 2A 02 01 00 02 01 00 30 12 30 10 06 0C 2B 06 01 02 01 2B 0E 01 01 06 01 05 05 00";
+
+    char source[] = "AC 1F 13 36"; //Result should be 172.31.19.54
+    char dest[] = "AC 1F 13 49"; //Result should be 172.31.19.73
+    char sourceIP[] = "172.31.19.54";
+    char destIP[] = "172.31.19.73";
+    //Converting the Hex to Decimal
+    char source2[16];
+    char dest2[16];
+    sprintf(source2, "%s", Hex2IP(source));
+    sprintf(dest2, "%s", Hex2IP(dest));
+
+    printf("The IP returned to the main is: %s\n", source2);
+    printf("The IP returned to the main is: %s\n", dest2);
+
+    printf("Does %s == %s ? Computer Says: %d\n", sourceIP, source2, strcmp(source2, sourceIP));
+    printf("Does %s == %s ? Computer Says: %d\n", destIP, dest2, strcmp(dest2, destIP));
+
+    if(strcmp(source2, sourceIP) == 0 && strcmp(dest2, destIP) == 0)
+        printf("The translation was successful!\n");
+    else
+        printf("The translations did not match :(\n");
+
+
+
+    decodePacket(fakePacket);
+
+
     return 0;
 }
