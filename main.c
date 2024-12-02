@@ -326,6 +326,12 @@ int HexToDec(const char *input) {
     // Ethan Dastick (Nov 24, 2024)
     // Updated the function to return the number once it has been converted, or
     // the sum if multiple hex pairs are sent.
+    //
+    // Ethan Dastick (Nov 25, 2025)
+    // Conversion for multiple pairs of hex values should not sum, but append
+    // ToDo: Fix the code so that multiple hex pair conversions are appended rather than summed
+    // Removed Print Statements
+    // Added the Loops iterator. This allows the int to append to the end of current value
     //************************************************************************
 
     char hex[100]; // Buffer for each hexadecimal number
@@ -339,7 +345,9 @@ int HexToDec(const char *input) {
 
     // Tokenize the input string using space as a delimiter
     char *token = strtok(inputCopy, " ");
-    while (token != NULL) {
+    int loopsCompleted = 0;
+    while (token != NULL)
+    {
         decimal = 0; // Reset decimal for each hex number
         int base = 1; // Base 16
 
@@ -372,27 +380,15 @@ int HexToDec(const char *input) {
             decimal += value * base;
             base *= 16; // Move to the next power of 16
         }
-        // Print the decimal value
-        if (decimal != 0) {
-            if(strlen(input) == 2) {
-                //Added by Ethan Dastick Nov, 24, 2024
-                //If the hex is only 2 digits long, return the converted value immediatly
-                return decimal;
-            }
-            printf("Hex: %s -> Decimal: %d\n", token, decimal);
-        }
 
         //Calc the total
-        total += decimal;
+        total = total * pow(100, loopsCompleted) + decimal; //todo does not sum correctly rn
+        int test = atoi("What");
 
         token = strtok(NULL, " "); // Get the next token
+        loopsCompleted++;
     }
-    if (total != 0) {
-        // Print the total sum of all decimal values
-        printf("Total Decimal Value: %d\n", total);
-        return total; // Added by Ethan Dastick to return the total sum of all hex pairs
-    }
-    return -1; //Returns -1 if there was an error - Added by Ethan Dastick
+    return total; //Returns the total - Added by Ethan Dastick
 }
 
 char *truncateSubstring(int len, char string[], bool removeSpace)
@@ -411,6 +407,16 @@ char *truncateSubstring(int len, char string[], bool removeSpace)
 
     //Pre-allocating substring variable
     char *substring = malloc(len);
+
+    if(strlen(string) <= len) {
+        for(int i = 0; i < strlen(string); i++){
+            substring[i] = string[i];
+        }
+        //Adding the end character
+        substring[strlen(string)] = '\000';
+        string[0] = '\000';
+        return substring;
+    }
 
     //Copying the first len characters from string to substring
     for(int i = 0; i < len; i++){
@@ -444,7 +450,6 @@ char *Hex2IP(const char FourHexPair[]) {
     //pair-by-pair and formats it to a proper IP address
     //
     //
-    //
     //Change Log:
     //
     //************************************************************************
@@ -463,20 +468,12 @@ char *Hex2IP(const char FourHexPair[]) {
                 IP[currentIndex] = '.';
             currentIndex++;
         }
-        //for(int j = i*4; j < (i+1)*4; j++)
-        //    if(j != 3)
-        //        IP[j] = converted[j-(i*4)];
-        //    else if(i != 3)
-        //        IP[j] = '.';
-        //strcat(IP, converted);
-        //if(i != 3)
-        //    strcat(IP, ".");
     }
     IP[currentIndex-1] = '\000';
     return IP;
 }
 
-void decodePacket(char *packet[]) {
+void decodePacket(char packet[]) {
     //************************************************************************
     // Author: Ethan Dastick
     // Created: Nov 23, 2024
@@ -495,7 +492,7 @@ void decodePacket(char *packet[]) {
     // Therefore the entire header should consist of the first 24 hex pairs
     // Accounting for spaces, the total number of chars should be (24*2) + (24-1) = 71
     if(strlen(packet) > 71)
-        packet[71] = nullptr;
+        packet[71] = '\000';
     else
         return;
 
@@ -513,12 +510,21 @@ void decodePacket(char *packet[]) {
 	char* SourceAddress = truncateSubstring(11, packet, true); //Source Addy: 32 Bits -> 4 Hex Pair (8char + 3 space)
 	char* DestinationAddress = truncateSubstring(11, packet, true);//Destination Addy: 32 Bits -> 4 Hex Pair (8char + 3 space)
 
-    printf("This is the Source Address Hex: %s\n", SourceAddress);
-    printf("This is the Destination Address Hex: %s\n", DestinationAddress);
+    int VrsnHdrLen = HexToDec(VersionAndHeaderLength);
+    int TypeOfService = HexToDec(ToS);
+    int PacketLen = HexToDec(TotalLen);
+    //Ident = HexToDec(Ident);
+    //FlagsAndFragOffset = HexToDec(FlagsAndFragOffset);
+    int TTL = HexToDec(TimeToLive);
+    int Prtcl = HexToDec(Protocol);
+    //HeaderChecksum = HexToDec(HeaderChecksum);
 
-    printf("The readable source IP is: %s\n", Hex2IP(SourceAddress));
-    printf("The readable destination IP is: %s\n", Hex2IP(DestinationAddress));
-    //HexToDec(SourceAddress);
+    SourceAddress = Hex2IP(SourceAddress);
+    DestinationAddress = Hex2IP(DestinationAddress);
+
+    printf("The readable source IP is: %s\n", SourceAddress);
+    printf("The readable destination IP is: %s\n", DestinationAddress);
+
 }
 
 int createBlackList() {
@@ -599,8 +605,10 @@ int main(int argc, char *argv[]) {
     //printf("In Main after Function: %d\n", HexToDec(test));
 
     //Testing decodePacket function
-    char fakePacket[] = "08 00 37 15 E6 BC 00 12 3F 4A 33 D2 08 00 45 00 00 48 AA 1D 00 00 80 11 11 CA AC 1F 13 36 AC 1F 13 49 3E 30 00 A1 00 34 FA 4E 30 2A 02 01 00 04 06 70 75 62 6C 69 63 A0 1D 02 01 2A 02 01 00 02 01 00 30 12 30 10 06 0C 2B 06 01 02 01 2B 0E 01 01 06 01 05 05 00";
-
+    //char fakePacket[] = "08 00 37 15 E6 BC 00 12 3F 4A 33 D2 08 00 45 00 00 48 AA 1D 00 00 80 11 11 CA AC 1F 13 36 AC 1F 13 49 3E 30 00 A1 00 34 FA 4E 30 2A 02 01 00 04 06 70 75 62 6C 69 63 A0 1D 02 01 2A 02 01 00 02 01 00 30 12 30 10 06 0C 2B 06 01 02 01 2B 0E 01 01 06 01 05 05 00";
+    char fakePacket[] = "45 00 01 52 72 c7 00 00 80 11 a8 fd c0 a8 ce 02 c0 a8 ce 82 00 35 8a d6 01 3e ff fc 0f e2 81 80 00 01 00 02 00 03 00 05 02 35 3603 3139 3003 3132 3503 3138 3507 696e 2d61 6464 7204 6172 7061 0000 0c00 01c0 0c00 0c00 0100 0000 0500 230a 7072 6f64 2d6e 7470 2d33 046e 7470 3103 7073 3509 6361 6e6f 6e69 6361 6c03 636f 6d00 c00c 000c 0001 0000 0005 0023 0a70 726f 642d 6e74 702d 3304 6e74 7034 0370 7335 0963 616e 6f6e 6963 616c 0363 6f6d 00c0 0f00 0200 0100 0000 0500 1303 6e73 3109 6361 6e6f 6e69 6361 6c03 636f 6d00 c00f 0002 0001 0000 0005 0006 036e 7333 c09b c00f 0002 0001 0000 0005 0006 036e 7332 c09b c097 0001 0001 0000 0005 0004 b97d be41 c0b6 0001 0001 0000 0005 0004 5bbd 5b8b c0c8 0001 0001 0000 0005 0004 b97d be42 c097 001c 0001 0000 0005 0010 2620 002d 4000 0001 0000 0000 0000 0043 c0c8 001c 0001 0000 0005 0010 2620 002d 4000 0001 0000 0000 0000 0044";
+    spacePackets(fakePacket);
+    /*
     char source[] = "AC 1F 13 36"; //Result should be 172.31.19.54
     char dest[] = "AC 1F 13 49"; //Result should be 172.31.19.73
     char sourceIP[] = "172.31.19.54";
@@ -610,7 +618,7 @@ int main(int argc, char *argv[]) {
     char dest2[16];
     sprintf(source2, "%s", Hex2IP(source));
     sprintf(dest2, "%s", Hex2IP(dest));
-
+`
     printf("The IP returned to the main is: %s\n", source2);
     printf("The IP returned to the main is: %s\n", dest2);
 
@@ -621,7 +629,7 @@ int main(int argc, char *argv[]) {
         printf("The translation was successful!\n");
     else
         printf("The translations did not match :(\n");
-
+    */
 
 
     decodePacket(fakePacket);
