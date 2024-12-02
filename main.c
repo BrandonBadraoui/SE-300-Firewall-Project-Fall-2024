@@ -45,8 +45,13 @@ void BlockDomain(char *domain) {
     }
 }
 
-int getIP(char *ip) {
+char *getDomain(char ip[]) {
+	char command[1000];
+	sprintf(command, "nslookup %s", ip);
+	int ret3 = system(command);
 
+	return "";//todo make sure that we can read in the domain name for a given IP address
+	//Then block if necessary.
 }
 
 void readInRealTime(const char *file_name) {
@@ -511,6 +516,48 @@ char *Hex2IP(const char FourHexPair[]) {
     return IP;
 }
 
+void checkBlacklist(char ip[]) {
+	//************************************************************************
+	// Author: Ethan Dastick
+	// Created: Dec. 2, 2024
+	// The function reads in the blacklist and compares the given IP to the IPs
+	// stored in the blacklist
+	// If the IP is found in the blacklist, the domain is blocked.
+	//
+	//
+	// Change Log:
+	//
+	//************************************************************************
+
+	const char *fileName = "BlackList.txt";
+	//Creates a pointer to the file, then opens the file with "fileName" and opens it to write mode
+	FILE *file = fopen(fileName, "r");
+	if (file == NULL)
+	{
+		printf("File does not exist\n");
+		return; //Terminates the program and informs the operating system that it was unsuccessful
+	}
+
+	char IPfromFile[17];
+	while (fgets(IPfromFile, 17, file) != NULL) {
+		//If '/n' is appended, delete
+		if(IPfromFile[strlen(IPfromFile)-1] == '\n')
+			IPfromFile[strlen(IPfromFile)-1] = '\000';
+		if(strcmp(IPfromFile, ip) == 0) {
+			//If the IP matches one found in the blacklist
+			//Block the Address
+			//printf("The Firewall has detected a blacklisted source attempting to contact the device...\n");
+			fclose(file);
+			BlockDomain(getDomain(ip));//Getting the domain name from IP then blocking the domain
+			return;
+		}
+		printf("");
+	}
+
+
+	fclose(file);
+}
+
 void decodePacket(char packet[]) {
     //************************************************************************
     // Author: Ethan Dastick
@@ -627,7 +674,7 @@ int main(int argc, char *argv[]) {
     //Testing decodePacket function
     //char fakePacket[] = "08 00 37 15 E6 BC 00 12 3F 4A 33 D2 08 00 45 00 00 48 AA 1D 00 00 80 11 11 CA AC 1F 13 36 AC 1F 13 49 3E 30 00 A1 00 34 FA 4E 30 2A 02 01 00 04 06 70 75 62 6C 69 63 A0 1D 02 01 2A 02 01 00 02 01 00 30 12 30 10 06 0C 2B 06 01 02 01 2B 0E 01 01 06 01 05 05 00";
     char fakePacket[] = "45 00 01 52 72 c7 00 00 80 11 a8 fd c0 a8 ce 02 c0 a8 ce 82 00 35 8a d6 01 3e ff fc 0f e2 81 80 00 01 00 02 00 03 00 05 02 35 3603 3139 3003 3132 3503 3138 3507 696e 2d61 6464 7204 6172 7061 0000 0c00 01c0 0c00 0c00 0100 0000 0500 230a 7072 6f64 2d6e 7470 2d33 046e 7470 3103 7073 3509 6361 6e6f 6e69 6361 6c03 636f 6d00 c00c 000c 0001 0000 0005 0023 0a70 726f 642d 6e74 702d 3304 6e74 7034 0370 7335 0963 616e 6f6e 6963 616c 0363 6f6d 00c0 0f00 0200 0100 0000 0500 1303 6e73 3109 6361 6e6f 6e69 6361 6c03 636f 6d00 c00f 0002 0001 0000 0005 0006 036e 7333 c09b c00f 0002 0001 0000 0005 0006 036e 7332 c09b c097 0001 0001 0000 0005 0004 b97d be41 c0b6 0001 0001 0000 0005 0004 5bbd 5b8b c0c8 0001 0001 0000 0005 0004 b97d be42 c097 001c 0001 0000 0005 0010 2620 002d 4000 0001 0000 0000 0000 0043 c0c8 001c 0001 0000 0005 0010 2620 002d 4000 0001 0000 0000 0000 0044";
-    spacePackets(fakePacket);
+    //spacePackets(fakePacket);
     /*
     char source[] = "AC 1F 13 36"; //Result should be 172.31.19.54
     char dest[] = "AC 1F 13 49"; //Result should be 172.31.19.73
@@ -651,8 +698,10 @@ int main(int argc, char *argv[]) {
         printf("The translations did not match :(\n");
     */
 
+	//char sourceIP[] = "172.31.19.54";
+	//checkBlacklist("192.36.24.123");
 
-    decodePacket(fakePacket);
+    //decodePacket(fakePacket);
 
 
     return 0;

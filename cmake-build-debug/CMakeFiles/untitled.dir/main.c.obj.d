@@ -30,4 +30,13 @@ CMakeFiles/untitled.dir/main.c.obj: \
  C:/Program\ Files/JetBrains/CLion\ 2024.2.2/bin/mingw/x86_64-w64-mingw32/include/_timeval.h \
  C:/Program\ Files/JetBrains/CLion\ 2024.2.2/bin/mingw/x86_64-w64-mingw32/include/pthread_time.h \
  C:/Program\ Files/JetBrains/CLion\ 2024.2.2/bin/mingw/x86_64-w64-mingw32/include/math.h \
- C:/Program\ Files/JetBrains/CLion\ 2024.2.2/bin/mingw/lib/gcc/x86_64-w64-mingw32/13.1.0/include/stdbool.h
+ C:/Program\ Files/JetBrains/CLion\ 2024.2.2/bin/mingw/lib/gcc/x86_64-w64-mingw32/13.1.0/include/stdbool.h \
+ C:/Program\ Files/JetBrains/CLion\ 2024.2.2/bin/mingw/x86_64-w64-mingw32/include/sys/stat.h \
+ C:/Program\ Files/JetBrains/CLion\ 2024.2.2/bin/mingw/x86_64-w64-mingw32/include/io.h \
+ C:/Program\ Files/JetBrains/CLion\ 2024.2.2/bin/mingw/x86_64-w64-mingw32/include/sys/types.h \
+ C:/Program\ Files/JetBrains/CLion\ 2024.2.2/bin/mingw/x86_64-w64-mingw32/include/_mingw_stat64.h \
+ C:/Program\ Files/JetBrains/CLion\ 2024.2.2/bin/mingw/x86_64-w64-mingw32/include/unistd.h \
+ C:/Program\ Files/JetBrains/CLion\ 2024.2.2/bin/mingw/x86_64-w64-mingw32/include/process.h \
+ C:/Program\ Files/JetBrains/CLion\ 2024.2.2/bin/mingw/x86_64-w64-mingw32/include/corecrt_startup.h \
+ C:/Program\ Files/JetBrains/CLion\ 2024.2.2/bin/mingw/x86_64-w64-mingw32/include/getopt.h \
+ C:/Program\ Files/JetBrains/CLion\ 2024.2.2/bin/mingw/x86_64-w64-mingw32/include/pthread_unistd.h

@@ -1,4 +1,6 @@
-This is your Black List File. Please save this file in an easily accessible location for your convince. 
- In the lines below you will write the Domain name of the websites that you wish to block. An example would be 'Google.com' 
- Please make sure to write each website on its OWN LINE. 
- 
+15
+192.34.23.144
+166.23.453.23
+121.456.124.515
+192.36.24.123
+192.34.234.21
