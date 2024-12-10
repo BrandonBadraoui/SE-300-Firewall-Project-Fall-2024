@@ -697,6 +697,8 @@ int main(int argc, char *argv[]) {
         printf("The translations did not match :(\n");
     */
 
+	//Test
+
 	//char sourceIP[] = "172.31.19.54";
 	checkBlacklist("192.36.24.123");
 
