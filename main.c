@@ -236,7 +236,7 @@ char* SHA256(char* data) {
 	return hashStr;
 }
 
-void LogTraffic(char IPaddress[]) {
+void LogTraffic(int Length, int TTL, int Protocol, char *Source, char *Destin) {
     //************************************************************************
     //Written by Ethan Dastick
     //Written on Nov 3, 2024 (11/3/2024)
@@ -247,8 +247,12 @@ void LogTraffic(char IPaddress[]) {
     // 11/6/2024 - Ethan Dastick
     // No direct change to code. Added Log-and-ACL folder to directory and it
     // magically started working as intended :/
-    // Todo: Make sure this works with an array containing multiple elements;
     // ie: [IP], [date], [Souce URL]... etc.
+	//
+	// 12/10/2024 - Ethan Dastick
+	// Log Function now works as intended. Multiple inputs may be sent and it will store
+	// each value in the correct column
+	// Future updates: Set up to take in **char rather than several parameters
     //************************************************************************
 
     FILE *logFile = fopen("..\\Log-and-ACL\\NetworkLog.csv", "a");
@@ -261,16 +265,26 @@ void LogTraffic(char IPaddress[]) {
 
         logFile = fopen("..\\Log-and-ACL\\NetworkLog.csv", "w");
 
-        fprintf(logFile, "File Created\n");
+    	//Printing header into Log File
+        fprintf(logFile, "Time Stamp,Packet Length,TTL,Protocol,Source IP,Destination IP\n");
         fclose(logFile);
         return;
     }
 
-    fprintf(logFile, "%s\n", IPaddress);
-    //Appending the IP to the file
+	//Getting Local Time from Computer
+	//From https://stackoverflow.com/questions/5141960/get-the-current-time-in-c
+	time_t rawTime;
+	struct tm * timeinfo;
+	time(&rawTime);
+	timeinfo = localtime(&rawTime);
+	char *timeReal = asctime(timeinfo);
+	timeReal[strlen(timeReal) - 1] = '\000';
+	//Appending the Packet Header Info to the Log file
+    fprintf(logFile, "%s,%d,%d,%d,%s,%s\n", timeReal, Length, TTL, Protocol, Source, Destin);
 
+
+	//Closing the file
     fclose(logFile);
-    //Closing the file
 }
 
 void spacePackets(const char *input) {
@@ -607,8 +621,13 @@ void decodePacket(char packet[]) {
     SourceAddress = Hex2IP(SourceAddress);
     DestinationAddress = Hex2IP(DestinationAddress);
 
-    printf("The readable source IP is: %s\n", SourceAddress);
-    printf("The readable destination IP is: %s\n", DestinationAddress);
+	//Checking source address to see if it is a blacklisted source
+	//If it is, this function will call another to block it.
+	checkBlacklist(SourceAddress);
+
+	LogTraffic(PacketLen, TTL, Prtcl, SourceAddress, DestinationAddress);
+    //printf("The readable source IP is: %s\n", SourceAddress);
+    //printf("The readable destination IP is: %s\n", DestinationAddress);
 
 }
 
@@ -639,7 +658,44 @@ int createWhiteList() {
 }
 
 int main(int argc, char *argv[]) {
-    // FindDeviceInfo();
+	bool testing = false;
+
+	if(!testing) {
+		//This is the main loop of the code
+		//This runs the firewall
+
+		//Creating the Whitelist and Blacklist if they do not already exist
+		createBlackList();
+		createWhiteList();
+
+		//Deleting the LogFile before every run for a fresh document
+		remove("..\\Log-and-ACL\\NetworkLog.csv");
+		//Creating the new Log File
+		LogTraffic(0, 0, 0, "", "");
+
+		//char Packet[3749]; //Maximum size of a packet is 1500 bytes -> 1500 hex pairs.
+		// One space every 4 hex pairs yields 3000 + (3000/4)-1
+		while(true) {
+			//Captures the packet and places it in Packet
+			//Packet = capturePacket();
+
+			//Temp for testing until we can read in from the terminal
+			char Packet[] = "45 00 01 52 72 c7 00 00 80 11 a8 fd c0 a8 ce 02 c0 a8 ce 82 00 35 8a d6 01 3e ff fc 0f e2 81 80 00 01 00 02 00 03 00 05 02 35 3603 3139 3003 3132 3503 3138 3507 696e 2d61 6464 7204 6172 7061 0000 0c00 01c0 0c00 0c00 0100 0000 0500 230a 7072 6f64 2d6e 7470 2d33 046e 7470 3103 7073 3509 6361 6e6f 6e69 6361 6c03 636f 6d00 c00c 000c 0001 0000 0005 0023 0a70 726f 642d 6e74 702d 3304 6e74 7034 0370 7335 0963 616e 6f6e 6963 616c 0363 6f6d 00c0 0f00 0200 0100 0000 0500 1303 6e73 3109 6361 6e6f 6e69 6361 6c03 636f 6d00 c00f 0002 0001 0000 0005 0006 036e 7333 c09b c00f 0002 0001 0000 0005 0006 036e 7332 c09b c097 0001 0001 0000 0005 0004 b97d be41 c0b6 0001 0001 0000 0005 0004 5bbd 5b8b c0c8 0001 0001 0000 0005 0004 b97d be42 c097 001c 0001 0000 0005 0010 2620 002d 4000 0001 0000 0000 0000 0043 c0c8 001c 0001 0000 0005 0010 2620 002d 4000 0001 0000 0000 0000 0044";
+
+			//Packet is sent to the decodePacket Function
+			//This function splits the packet into its header, then compares the source IP
+			//to the blacklist. If found, the domain is sent to the blockDomain function.
+			//Once this is complete, the header contents are sent to the log file.
+			if(Packet != NULL)
+				decodePacket(Packet);
+			sleep(10);
+		}
+	}
+
+	//Testing area
+	//remove("..\\Log-and-ACL\\NetworkLog.csv");
+	LogTraffic(7, round(rand()*20), 14, "123.123.123.123", "321.321.321.321");
+	// FindDeviceInfo();
     // const char *input = "c0 a8 ce 82"; // Example input 22 a0 90 bf
     // HexToDec(input); // Call the function to process the input
     // HexToASCII(input);
@@ -700,10 +756,13 @@ int main(int argc, char *argv[]) {
 	//Test don't die on me
 
 	//char sourceIP[] = "172.31.19.54";
-	checkBlacklist("192.36.24.123");
+	//checkBlacklist("192.36.24.123");
 
 	//char packet[] = "45 00 01 52 72 c7 00 00 80 11 a8 fd c0 a8 ce 02 c0 a8 ce 82 00 35 8a d6 01 3e ff fc 0f e2 81 80 00 01 00 02 00 03 00 05 02 35 3603 3139 3003 3132 3503 3138 3507 696e 2d61 6464 7204 6172 7061 0000 0c00 01c0 0c00 0c00 0100 0000 0500 230a 7072 6f64 2d6e 7470 2d33 046e 7470 3103 7073 3509 6361 6e6f 6e69 6361 6c03 636f 6d00 c00c 000c 0001 0000 0005 0023 0a70 726f 642d 6e74 702d 3304 6e74 7034 0370 7335 0963 616e 6f6e 6963 616c 0363 6f6d 00c0 0f00 0200 0100 0000 0500 1303 6e73 3109 6361 6e6f 6e69 6361 6c03 636f 6d00 c00f 0002 0001 0000 0005 0006 036e 7333 c09b c00f 0002 0001 0000 0005 0006 036e 7332 c09b c097 0001 0001 0000 0005 0004 b97d be41 c0b6 0001 0001 0000 0005 0004 5bbd 5b8b c0c8 0001 0001 0000 0005 0004 b97d be42 c097 001c 0001 0000 0005 0010 2620 002d 4000 0001 0000 0000 0000 0043 c0c8 001c 0001 0000 0005 0010 2620 002d 4000 0001 0000 0000 0000 0044";
     //decodePacket(packet);
+
+
+
 
 
     return 0;
